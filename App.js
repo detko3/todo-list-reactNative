@@ -1,5 +1,5 @@
 import { StatusBar } from "expo-status-bar";
-import React from "react";
+import React, { useCallback } from "react";
 import { useState, useEffect } from "react";
 import {
   StyleSheet,
@@ -12,6 +12,7 @@ import {
 } from "react-native";
 import { SwipeListView } from "react-native-swipe-list-view";
 import { AntDesign } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import Task from "./components/Task";
 
@@ -19,16 +20,41 @@ export default function App() {
   const [task, setTask] = useState();
   const [taskItems, setTaskItems] = useState([]);
 
+  const storeData = async (data) => {
+    try {
+      AsyncStorage.clear();
+      const jsonValue = JSON.stringify(data);
+      await AsyncStorage.setItem("@storage_Key", jsonValue);
+    } catch (e) {
+      // saving error
+      console.log("nevydalo");
+    }
+  };
+
+  const getData = async () => {
+    return await AsyncStorage.getItem("@storage_Key")
+      .then((req) => (req != null ? JSON.parse(req) : []))
+      // .then((json) => console.log(json))
+      .catch((error) => console.log("error!"));
+  };
+
+  useEffect(() => {
+    getData().then((data) => setTaskItems(data));
+  }, [setTaskItems]);
+
   const handleAddTask = () => {
     Keyboard.dismiss();
-    setTaskItems([...taskItems, task]);
+    const tmp = [...taskItems, task];
+    setTaskItems(tmp);
     setTask(null);
+    storeData(tmp);
   };
 
   const handleDeleteTask = (index) => {
     let tmpItems = [...taskItems];
     tmpItems.splice(index, 1);
     setTaskItems(tmpItems);
+    storeData(tmpItems);
   };
 
   const renderItem = (data) => {
