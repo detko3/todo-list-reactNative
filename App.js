@@ -1,6 +1,6 @@
 import { StatusBar } from "expo-status-bar";
 import React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   StyleSheet,
   Text,
@@ -23,7 +23,6 @@ export default function App() {
     Keyboard.dismiss();
     setTaskItems([...taskItems, task]);
     setTask(null);
-    //  console.log(task);
   };
 
   const handleDeleteTask = (index) => {
@@ -32,17 +31,14 @@ export default function App() {
     setTaskItems(tmpItems);
   };
 
-  //console.log("app", taskItems);
-  //<Tasks taskItems={taskItems} />;
-
   const renderItem = (data) => {
     return <Task text={data.item} />;
   };
 
-  const renderHiddenItem = (data, rowMap) => (
+  const renderHiddenItem = (data) => (
     <View style={styles.rowBack}>
       <TouchableOpacity
-        style={[styles.actionButton, styles.deleteBtn]}
+        style={styles.deleteBtn}
         onPress={() => handleDeleteTask(data.index)}
       >
         <AntDesign name="delete" size={25} />
@@ -57,7 +53,7 @@ export default function App() {
       <SwipeListView
         style={styles.scrollContainer}
         data={taskItems}
-        keyExtractor={(item) => item.index}
+        keyExtractor={(item) => item}
         renderItem={renderItem}
         renderHiddenItem={renderHiddenItem}
         rightOpenValue={-60}
@@ -109,18 +105,11 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
     marginVertical: 10,
   },
-  actionButton: {
+  deleteBtn: {
     alignItems: "center",
     justifyContent: "center",
     position: "absolute",
     width: 75,
-  },
-
-  closeBtn: {
-    right: 75,
-  },
-
-  deleteBtn: {
     right: 0,
   },
 
